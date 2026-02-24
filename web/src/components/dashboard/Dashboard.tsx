@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { X } from "lucide-react"
 import { HeaderBar } from "./HeaderBar"
@@ -22,18 +22,62 @@ export default function Dashboard() {
   const [showManual, setShowManual] = useState(false)
   const [recentEntries, setRecentEntries] = useState<RecentEntry[]>(initialRecentEntries)
   const [todaysTotal, setTodaysTotal] = useState(Number(initialSummaryCards[0].value))
+  const [usageByCategory, setUsageByCategory] = useState(initialUsageByCategory)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:3000"
+
+  const fetchDashboard = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch(`${apiBase}/usage/dashboard`)
+      if (!res.ok) throw new Error(`Failed to load dashboard: ${res.status}`)
+      const data = await res.json()
+      setRecentEntries(data.recentEntries ?? [])
+      setUsageByCategory(data.usageByCategory ?? initialUsageByCategory)
+      const first = data.summaryCards?.[0]?.value
+      if (typeof first === "number") {
+        setTodaysTotal(first)
+      } else if (typeof first === "string") {
+        const num = parseFloat(first)
+        if (!Number.isNaN(num)) setTodaysTotal(num)
+      }
+    } catch (err: any) {
+      setError(err.message ?? "Unable to load dashboard")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchDashboard()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const summaryCards = [
     { ...initialSummaryCards[0], value: `${todaysTotal.toFixed(1)} L` },
     ...initialSummaryCards.slice(1),
   ]
 
-  const handleAddEntry = ({ usageType, amount, notes }: { usageType: string; amount: number; notes?: string }) => {
-    const now = new Date()
-    const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    const activity = notes ? `${usageType} · ${notes}` : usageType
-    setRecentEntries((prev) => [{ time, activity, volume: `${amount.toFixed(1)} L`, efficiency: "Manual" }, ...prev].slice(0, 8))
-    setTodaysTotal((prev) => +(prev + amount).toFixed(1))
+  const handleAddEntry = async ({ usageType, amount, notes }: { usageType: string; amount: number; notes?: string }) => {
+    try {
+      const res = await fetch(`${apiBase}/usage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usageType, amount, notes }),
+      })
+      if (!res.ok) throw new Error("Failed to save entry")
+      const entry = await res.json()
+      const date = new Date(entry.date)
+      const time = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      const activity = entry.notes ? `${entry.usageType} · ${entry.notes}` : entry.usageType
+      setRecentEntries((prev) => [{ time, activity, volume: `${entry.amount.toFixed(1)} L`, efficiency: "Manual" }, ...prev].slice(0, 10))
+      setTodaysTotal((prev) => +(prev + entry.amount).toFixed(1))
+      fetchDashboard()
+    } catch (err: any) {
+      setError(err.message ?? "Unable to save entry")
+    }
   }
 
   return (
@@ -80,11 +124,13 @@ export default function Dashboard() {
             </div>
           )}
 
+          {error && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">{error}</div>}
+
           <SummaryGrid cards={summaryCards} />
 
           <div className="grid gap-4 lg:grid-cols-3">
             <WeeklyUsageCard />
-            <UsageByCategoryCard categories={initialUsageByCategory} />
+            <UsageByCategoryCard categories={usageByCategory} />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
