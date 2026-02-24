@@ -1,6 +1,6 @@
 import { Gauge } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../../lib/utils"
 
 interface UsageCategory {
   label: string
