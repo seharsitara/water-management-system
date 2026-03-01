@@ -1,4 +1,4 @@
-import { Controller, Post,Body, Req,Get,UseGuards} from '@nestjs/common';
+import { Controller, Post,Body, Req,Get,UseGuards, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
@@ -16,6 +16,17 @@ export class AuthController {
   @Post('login')
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Get('me')
+  async me(@Req() req) {
+    const authHeader = req.headers.authorization || ''
+    const token = authHeader.replace('Bearer ', '')
+    const user = await this.authService.validateToken(token)
+    if (!user) {
+      throw new UnauthorizedException('Invalid token')
+    }
+    return user
   }
 
   @Get('google')

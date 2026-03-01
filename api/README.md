@@ -31,6 +31,33 @@
 $ npm install
 ```
 
+## Environment Variables
+
+Create a `.env` file in the `api` folder with the following:
+
+```env
+# Supabase configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Server port (default: 3000)
+PORT=8000
+
+# JWT secret
+JWT_SECRET=your-secret-key
+```
+
+You can find your Supabase credentials in the Supabase dashboard under **Settings > API**.
+
+## Database Setup (First Time Only)
+
+1. Copy the SQL from `schema.sql` in this folder
+2. Go to your **Supabase Dashboard → SQL Editor**
+3. Click **New Query** and paste the entire schema
+4. Click **Run** to create all tables
+
+Once the tables are created, the app will be able to store users, usage entries, and settings in the database.
+
 ## Compile and run the project
 
 ```bash

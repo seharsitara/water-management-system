@@ -3,4 +3,5 @@ export class CreateUsageDto {
   usageType: string
   amount: number
   notes?: string
+  duration?: number
 }

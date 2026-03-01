@@ -1,13 +1,41 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Chrome, Droplets, Eye, EyeOff, LogIn } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
 
 import { Button } from "../../components/ui/button"
 
 export default function Login() {
 	const [showPassword, setShowPassword] = useState(false)
+	const [email, setEmail] = useState("")
+	const [password, setPassword] = useState("")
+	const [error, setError] = useState("")
+	const [isLoading, setIsLoading] = useState(false)
+	const { login, user, loading: authLoading } = useAuth()
+	const router = useRouter()
+
+	// redirect if already logged in
+	useEffect(() => {
+		if (!authLoading && user) {
+			router.push('/dashboard')
+		}
+	}, [authLoading, user, router])
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setError("")
+		setIsLoading(true)
+		try {
+			await login(email, password)
+		} catch (err: any) {
+			setError(err.message || "Login failed. Please try again.")
+		} finally {
+			setIsLoading(false)
+		}
+	}
 
 	return (
 		<div className="min-h-screen flex justify-center items-center bg-linear-to-b from-sky-50 via-white to-sky-50 text-slate-900">
@@ -23,43 +51,54 @@ export default function Login() {
 					</div>
 
 
-					<form className="mt-6 space-y-5">
-						<div className="space-y-4">
-							<label className="block text-sm font-medium text-slate-700 mb-2" htmlFor="email">
-								Email Address
-							</label>
+<form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+					{error && (
+						<div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-200">
+							{error}
+						</div>
+					)}
+					<div className="space-y-4">
+						<label className="block text-sm font-medium text-slate-700 mb-2" htmlFor="email">
+							Email Address
+						</label>
+						<input
+							id="email"
+							type="email"
+							placeholder="e.g. user@example.com"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							required
+							className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm transition outline-none hover:border-sky-200"
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<div className="flex items-center justify-between text-sm font-medium text-slate-700">
+							<label className="block text-sm font-medium text-slate-700" htmlFor="password">Password</label>
+						</div>
+						<div className="relative">
 							<input
-								id="email"
-								type="email"
-								placeholder="e.g. user@example.com"
-								className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm transition outline-none hover:border-sky-200"
+								id="password"
+								type={showPassword ? "text" : "password"}
+								placeholder="••••••••"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								required
+								className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900 shadow-sm transition outline-none hover:border-sky-200"
 							/>
+							<button
+								type="button"
+								aria-label="Toggle password visibility"
+								onClick={() => setShowPassword((prev) => !prev)}
+								className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-slate-700"
+							>
+								{showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+							</button>
 						</div>
+					</div>
 
-						<div className="space-y-2">
-							<div className="flex items-center justify-between text-sm font-medium text-slate-700">
-								<label className="block text-sm font-medium text-slate-700" htmlFor="password">Password</label>
-							</div>
-							<div className="relative">
-								<input
-									id="password"
-									type={showPassword ? "text" : "password"}
-									placeholder="••••••••"
-									  className="w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 pr-10 text-sm text-slate-900 shadow-sm transition outline-none hover:border-sky-200"
-								/>
-								<button
-									type="button"
-									aria-label="Toggle password visibility"
-									onClick={() => setShowPassword((prev) => !prev)}
-									className="absolute inset-y-0 right-3 flex items-center text-slate-500 hover:text-slate-700"
-								>
-									{showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-								</button>
-							</div>
-						</div>
-
-						<Button className="flex w-full items-center justify-center gap-2 bg-sky-600 text-white hover:bg-sky-700">
-							Sign In
+					<Button disabled={isLoading} className="flex w-full items-center justify-center gap-2 bg-sky-600 text-white hover:bg-sky-700">
+						{isLoading ? "Signing in..." : "Sign In"}
 						</Button>
 					</form>
 

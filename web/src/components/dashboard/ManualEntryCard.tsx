@@ -1,8 +1,8 @@
-import { CalendarDays, FileText, Tag, Waves } from "lucide-react"
+import { CalendarDays, FileText, Tag, Waves, Clock } from "lucide-react"
 import { useState } from "react"
 
 interface ManualEntryCardProps {
-  onAdd: (entry: { usageType: string; amount: number; date: string; notes?: string }) => void
+  onAdd: (entry: { usageType: string; amount: number; date: string; notes?: string; duration?: number }) => void
   onCancel?: () => void
 }
 
@@ -12,6 +12,7 @@ export function ManualEntryCard({ onAdd, onCancel }: ManualEntryCardProps) {
   const [amount, setAmount] = useState("")
   const [usageType, setUsageType] = useState("")
   const [notes, setNotes] = useState("")
+  const [duration, setDuration] = useState("")
   const [error, setError] = useState("")
 
   const handleSubmit = () => {
@@ -30,10 +31,17 @@ export function ManualEntryCard({ onAdd, onCancel }: ManualEntryCardProps) {
     }
 
     setError("")
-    onAdd({ usageType, amount: parsed, date, notes: notes.trim() || undefined })
+    onAdd({
+      usageType,
+      amount: parsed,
+      date,
+      notes: notes.trim() || undefined,
+      duration: duration ? parseInt(duration) : undefined,
+    })
     setAmount("")
     setUsageType("")
     setNotes("")
+    setDuration("")
     setDate(today)
   }
 
@@ -81,6 +89,21 @@ export function ManualEntryCard({ onAdd, onCancel }: ManualEntryCardProps) {
               />
               <span className="pointer-events-none absolute right-4 text-sm font-medium text-slate-400">Liters</span>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <Clock className="size-4 text-sky-600" /> Duration (minutes)
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              placeholder="e.g. 15"
+              className="h-12 rounded-lg border border-slate-200 bg-slate-50 px-4 text-slate-900 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
+            />
           </div>
         </div>
 

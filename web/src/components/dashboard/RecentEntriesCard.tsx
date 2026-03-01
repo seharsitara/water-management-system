@@ -24,8 +24,8 @@ export function RecentEntriesCard({ entries }: RecentEntriesCardProps) {
           <span>Efficiency Status</span>
         </div>
         <div className="divide-y divide-slate-200 bg-white text-sm text-slate-800">
-          {entries.map((entry) => (
-            <div key={`${entry.time}-${entry.activity}`} className="grid grid-cols-4 px-4 py-3">
+          {entries.map((entry, idx) => (
+            <div key={`${entry.time}-${entry.activity}-${idx}`} className="grid grid-cols-4 px-4 py-3">
               <span>{entry.time}</span>
               <span>{entry.activity}</span>
               <span>{entry.volume}</span>

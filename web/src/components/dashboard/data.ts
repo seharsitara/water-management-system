@@ -32,7 +32,7 @@ export const initialUsageByCategory = [
 ]
 
 export const initialRecentEntries = [
-  { time: "11:02 PM", activity: "Shower", volume: "65.8 L", efficiency: "Good" },
-  { time: "06:37 PM", activity: "Laundry", volume: "12.2 L", efficiency: "Excellent" },
-  { time: "01:52 PM", activity: "Dishwasher", volume: "10.2 L", efficiency: "Average" },
+  { time: "11:02 PM", activity: "Shower", volume: "65.8 L", efficiency: "Good", duration: "10 min" },
+  { time: "06:37 PM", activity: "Laundry", volume: "12.2 L", efficiency: "Excellent", duration: "45 min" },
+  { time: "01:52 PM", activity: "Dishwasher", volume: "10.2 L", efficiency: "Average", duration: "2h 15m" },
 ]

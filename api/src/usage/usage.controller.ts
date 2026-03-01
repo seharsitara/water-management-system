@@ -15,4 +15,29 @@ export class UsageController {
   createEntry(@Body() dto: CreateUsageDto) {
     return this.usageService.create(dto)
   }
+
+  @Get('history')
+  getHistory() {
+    return this.usageService.findHistory()
+  }
+
+  @Get('categories')
+  getCategories() {
+    return this.usageService.getCategories()
+  }
+
+  @Post('categories')
+  createCategory(@Body() body: any) {
+    return this.usageService.createCategory(body)
+  }
+
+  @Get('settings')
+  getUserSettings() {
+    return this.usageService.getUserSettings()
+  }
+
+  @Post('settings')
+  updateUserSettings(@Body() body: any) {
+    return this.usageService.updateUserSettings(body)
+  }
 }

@@ -29,6 +29,17 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Environment Variables
+
+This project communicates with a separate NestJS backend running on port 8000 by default. Create a `.env.local` file in the `web` folder and add:
+
+```env
+NEXT_PUBLIC_API_BASE=http://localhost:8000   # or the URL where your Nest service is running
+```
+
+If you see 404 pages during login/signup it's usually because the frontend is hitting its own server instead of the backend; make sure the `NEXT_PUBLIC_API_BASE` value is correct (avoid `:3000` or typos like `80000`).
+
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
