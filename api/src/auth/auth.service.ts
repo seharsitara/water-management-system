@@ -43,6 +43,11 @@ export class AuthService {
       .select()
       .single();
 
+    // create default settings row for this user
+    if (newUser && newUser.id) {
+      await this.supabase.from('user_settings').insert({ user_id: newUser.id })
+    }
+
     if (error) {
       console.error('Supabase signup error details:', {
         code: error.code,
@@ -96,6 +101,7 @@ export class AuthService {
   async validateToken(token: string) {
     try {
       const payload = this.jwtService.verify(token);
+      console.log('[AuthService.validateToken] payload:', payload)
       
       // Fetch user from Supabase using the ID from token
       const { data: user, error } = await this.supabase

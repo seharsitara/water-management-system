@@ -1,3 +1,5 @@
+export type EntityType = 'home' | 'society' | 'industry'
+
 export interface SummaryCard {
   label: string
   value: string | number
@@ -32,6 +34,7 @@ export interface DashboardResponse {
   monthlyTotal: number
   monthlyTarget: number
   weeklyTrends?: WeeklyTrends
+  entityType?: EntityType
 }
 
 export interface WeeklyTrends {
@@ -46,4 +49,16 @@ export interface CreateUsagePayload {
   notes?: string
   date?: string
   duration?: number
+  entityType?: EntityType
+  entityName?: string
+}
+
+export interface ReportsResponse {
+  thisYearTotal: number
+  lastYearTotal: number
+  yoyChange: number
+  yoyPositive: boolean
+  avgDailyUsage: number
+  daysElapsed: number
+  monthlyTrend: { date: string; usage: number }[]
 }

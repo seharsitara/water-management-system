@@ -20,10 +20,16 @@ export class AuthController {
 
   @Get('me')
   async me(@Req() req) {
-    const authHeader = req.headers.authorization || ''
-    const token = authHeader.replace('Bearer ', '')
+    // Accept token from Authorization header or cookie for flexibility
+    const authHeader = (req.headers.authorization as string) || ''
+    let token = authHeader.replace('Bearer ', '')
+    if (!token && req.cookies && req.cookies.authToken) {
+      token = req.cookies.authToken
+    }
+    console.log('[AuthController.me] received token length:', token ? token.length : 0)
     const user = await this.authService.validateToken(token)
     if (!user) {
+      console.warn('[AuthController.me] token validation failed')
       throw new UnauthorizedException('Invalid token')
     }
     return user

@@ -9,11 +9,12 @@ import { GoogleStrategy } from './strategies/google.strategy';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'mysecretkey',
-      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET || 'mysecretkey',
+      signOptions: { expiresIn: (process.env.JWT_EXPIRES_IN as any) || '1h' },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService,GoogleStrategy]
+  providers: [AuthService,GoogleStrategy],
+  exports: [AuthService]  // allow other modules to inject AuthService
 })
 export class AuthModule {}

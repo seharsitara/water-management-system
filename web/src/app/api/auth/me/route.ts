@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get('authToken')?.value
-
+    let token = request.cookies.get('authToken')?.value
+    if (!token) {
+      // Try Authorization header
+      const authHeader = request.headers.get('authorization')
+      if (authHeader?.startsWith('Bearer ')) {
+        token = authHeader.slice(7)
+      }
+    }
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

@@ -24,18 +24,33 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>
 }
 
-function buildHeaders(headers?: HeadersInit): HeadersInit {
-  return {
-    "Content-Type": "application/json",
-    ...headers,
+function getAuthToken(): string | null {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("authToken")
   }
+  return null
+}
+
+function buildHeaders(headers?: HeadersInit): HeadersInit {
+  const token = getAuthToken()
+  // use a simple string map so we can freely assign keys
+  const base: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...((headers as Record<string, string>) || {}),
+  }
+  if (token) {
+    base["Authorization"] = `Bearer ${token}`
+  }
+  return base as HeadersInit
 }
 
 export async function get<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     cache: "no-store",
+    credentials: "include",
     ...init,
     method: "GET",
+    headers: buildHeaders(init?.headers),
   })
   return handleResponse<T>(res)
 }
@@ -43,6 +58,7 @@ export async function get<T>(path: string, init?: RequestInit): Promise<T> {
 export async function post<T, B = unknown>(path: string, body: B, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
+    credentials: "include",
     method: "POST",
     headers: buildHeaders(init?.headers),
     body: JSON.stringify(body),

@@ -30,7 +30,9 @@ export function useHistory() {
       const data = await fetchHistory()
       setState({ entries: data, loading: false, error: null })
     } catch (err: any) {
-      setState((s) => ({ ...s, loading: false, error: err.message || "Failed to load history" }))
+      // Suppress auth errors (401/Invalid token) - just show empty data for guests
+      const isAuthError = err.status === 401 || err.message?.toLowerCase().includes("invalid token") || err.message?.toLowerCase().includes("unauthorized")
+      setState((s) => ({ ...s, loading: false, error: isAuthError ? null : (err.message || "Failed to load history") }))
     }
   }
 

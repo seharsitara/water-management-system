@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
 
     return res
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    console.error('[/api/auth/login] error:', error?.message ?? error, error?.stack ?? '')
+    return NextResponse.json({ error: error?.message ?? String(error) }, { status: 400 })
   }
 }

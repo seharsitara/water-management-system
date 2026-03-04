@@ -1,8 +1,10 @@
 import { get, post } from "@/lib/apiClient"
-import { CreateUsagePayload, DashboardResponse } from "@/types/dashboard"
+import { CreateUsagePayload, DashboardResponse, ReportsResponse } from "@/types/dashboard"
 
-export function fetchDashboard() {
-  return get<DashboardResponse>("/usage/dashboard")
+export type EntityType = 'home' | 'society' | 'industry'
+
+export function fetchDashboard(entityType: EntityType = 'home') {
+  return get<DashboardResponse>(`/usage/dashboard?entityType=${entityType}`)
 }
 
 export function createUsage(payload: CreateUsagePayload) {
@@ -22,6 +24,11 @@ export function createCategory(payload: { name: string; icon?: string; daily_lim
   return post<unknown, any>("/usage/categories", payload)
 }
 
+// alerts API
+export function fetchAlerts() {
+  return get<Array<any>>("/usage/alerts")
+}
+
 // User Settings API
 export function fetchUserSettings() {
   return get<any>("/usage/settings")
@@ -30,3 +37,7 @@ export function fetchUserSettings() {
 export function updateUserSettings(payload: { id?: string; daily_limit?: number; monthly_limit?: number; notifications_enabled?: boolean }) {
   return post<unknown, any>("/usage/settings", payload)
 }
+
+// Reports API
+export function fetchReports() {
+  return get<ReportsResponse>("/usage/reports")}

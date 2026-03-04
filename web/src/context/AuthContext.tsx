@@ -53,11 +53,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
 
       if (!response.ok) {
-        throw new Error("Login failed")
+        const text = await response.text()
+          console.error('[AuthContext.login] backend responded', response.status, text)
+          throw new Error(text || "Login failed")
       }
 
-      const { user: userData } = await response.json()
+      const { user: userData, token } = await response.json()
       setUser(userData)
+      if (token) {
+        try {
+          localStorage.setItem("authToken", token)
+        } catch {}
+      }
       router.push("/dashboard")
     } catch (error) {
       console.error("Login error:", error)
@@ -81,8 +88,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(text || "Signup failed")
       }
 
-      const { user: userData } = await response.json()
+      const { user: userData, token } = await response.json()
       setUser(userData)
+      if (token) {
+        try {
+          localStorage.setItem("authToken", token)
+        } catch {}
+      }
       router.push("/dashboard")
     } catch (error) {
       console.error("Signup error:", error)
@@ -96,6 +108,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // call backend to clear cookie
       await fetch('/api/auth/logout', { method: 'POST' })
+      try {
+        localStorage.removeItem("authToken")
+      } catch {}
       setUser(null)
       router.push("/login")
     } catch (error) {

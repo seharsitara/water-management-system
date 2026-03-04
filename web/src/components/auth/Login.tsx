@@ -51,7 +51,7 @@ export default function Login() {
 					</div>
 
 
-<form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+<form className="mt-6 space-y-5" onSubmit={handleSubmit} autoComplete="on">
 					{error && (
 						<div className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-200">
 							{error}
@@ -63,6 +63,8 @@ export default function Login() {
 						</label>
 						<input
 							id="email"
+							name="email"
+							autoComplete="email"
 							type="email"
 							placeholder="e.g. user@example.com"
 							value={email}
@@ -79,6 +81,8 @@ export default function Login() {
 						<div className="relative">
 							<input
 								id="password"
+								name="current-password"
+								autoComplete="current-password"
 								type={showPassword ? "text" : "password"}
 								placeholder="••••••••"
 								value={password}

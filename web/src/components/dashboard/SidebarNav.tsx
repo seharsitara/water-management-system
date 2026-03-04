@@ -51,8 +51,8 @@ export function SidebarNav({ settingsOpen, onToggleSettings }: SidebarNavProps) 
               <User className="size-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-900">{user?.name || "User"}</p>
-              <p className="text-[11px] text-slate-500">{user?.email || "user@example.com"}</p>
+              <p className="text-sm font-semibold text-slate-900">{user?.name || "Guest"}</p>
+              <p className="text-[11px] text-slate-500">{user?.email || "Not signed in"}</p>
             </div>
           </div>
 
@@ -69,14 +69,33 @@ export function SidebarNav({ settingsOpen, onToggleSettings }: SidebarNavProps) 
           </button>
 
           {settingsOpen && (
-            <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-700">
-              <button
-                onClick={logout}
-                className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-slate-50"
-              >
-                <LogOut className="size-4 text-rose-500" />
-                Logout
-              </button>
+            <div className="space-y-1 rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-700">
+              {user ? (
+                <button
+                  onClick={logout}
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-slate-50"
+                >
+                  <LogOut className="size-4 text-rose-500" />
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-slate-50"
+                  >
+                    <LogIn className="size-4 text-sky-500" />
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-slate-50"
+                  >
+                    <User className="size-4 text-emerald-500" />
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </div>
