@@ -17,7 +17,6 @@ interface ManualEntryCardProps {
   onCancel?: () => void
 }
 
-// Entity type configurations with limits
 const ENTITY_CONFIG = {
   home: {
     label: 'Home',
@@ -73,10 +72,8 @@ export function ManualEntryCard({ onAdd, onCancel }: ManualEntryCardProps) {
       return
     }
 
-    // Validate amount against entity limits
     if (parsed > currentConfig.dailyLimit) {
       setError(`Warning: Amount exceeds daily limit of ${currentConfig.dailyLimit}L for ${currentConfig.label}`)
-      // Still allow submission but show warning
     }
 
     setError("")
@@ -112,7 +109,6 @@ export function ManualEntryCard({ onAdd, onCancel }: ManualEntryCardProps) {
       </div>
 
       <div className="space-y-6 px-6 py-6">
-        {/* Entity Type Selection */}
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Building2 className="size-4 text-sky-600" /> Entity Type *
@@ -152,7 +148,7 @@ export function ManualEntryCard({ onAdd, onCancel }: ManualEntryCardProps) {
               )
             })}
           </div>
-          {/* Show selected entity limits */}
+          
           <div className={cn(
             "flex items-center justify-between rounded-lg px-4 py-2 text-xs font-medium",
             entityType === 'home' ? "bg-sky-50 text-sky-700"
@@ -164,7 +160,7 @@ export function ManualEntryCard({ onAdd, onCancel }: ManualEntryCardProps) {
           </div>
         </div>
 
-        {/* Entity Name */}
+        
         <div className="flex flex-col gap-2">
           <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <Tag className="size-4 text-sky-600" /> Entity Name

@@ -17,7 +17,6 @@ export default function Login() {
 	const { login, user, loading: authLoading } = useAuth()
 	const router = useRouter()
 
-	// redirect if already logged in
 	useEffect(() => {
 		if (!authLoading && user) {
 			router.push('/dashboard')

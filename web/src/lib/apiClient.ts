@@ -33,7 +33,6 @@ function getAuthToken(): string | null {
 
 function buildHeaders(headers?: HeadersInit): HeadersInit {
   const token = getAuthToken()
-  // use a simple string map so we can freely assign keys
   const base: Record<string, string> = {
     "Content-Type": "application/json",
     ...((headers as Record<string, string>) || {}),

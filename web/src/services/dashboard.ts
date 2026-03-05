@@ -15,7 +15,6 @@ export function fetchHistory() {
   return get<Array<any>>("/usage/history")
 }
 
-// Categories API
 export function fetchCategories() {
   return get<Array<any>>("/usage/categories")
 }
@@ -24,12 +23,10 @@ export function createCategory(payload: { name: string; icon?: string; daily_lim
   return post<unknown, any>("/usage/categories", payload)
 }
 
-// alerts API
 export function fetchAlerts() {
   return get<Array<any>>("/usage/alerts")
 }
 
-// User Settings API
 export function fetchUserSettings() {
   return get<any>("/usage/settings")
 }
@@ -38,6 +35,5 @@ export function updateUserSettings(payload: { id?: string; daily_limit?: number;
   return post<unknown, any>("/usage/settings", payload)
 }
 
-// Reports API
 export function fetchReports() {
   return get<ReportsResponse>("/usage/reports")}

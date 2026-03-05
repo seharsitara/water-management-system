@@ -9,7 +9,6 @@ import { SidebarNav } from "@/components/dashboard/SidebarNav"
 
 type EntityType = 'home' | 'society' | 'industry'
 
-// Entity-specific limits
 const ENTITY_LIMITS = {
   home: { daily: 500, monthly: 15000, label: 'Home', avgEntry: 50 },
   society: { daily: 5000, monthly: 150000, label: 'Society', avgEntry: 500 },
@@ -22,7 +21,6 @@ const ENTITY_OPTIONS = [
   { value: 'industry' as EntityType, label: 'Industry', icon: Factory },
 ]
 
-// Get alert level based on percentage
 const getAlertLevel = (percent: number) => {
   if (percent >= 100) return { type: 'critical', color: 'red', bgColor: 'bg-red-100', textColor: 'text-red-700' }
   if (percent >= 80) return { type: 'warning', color: 'amber', bgColor: 'bg-amber-100', textColor: 'text-amber-700' }
@@ -54,7 +52,6 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
 
   const limits = ENTITY_LIMITS[entityType]
 
-  // Format amount based on entity type
   const formatAmount = (amount: number) => {
     if (entityType === 'industry' && amount >= 1000) {
       return `${(amount / 1000).toFixed(1)}k L`
@@ -83,7 +80,6 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
   const totalEntries = entries.length
   const totalWater = entries.reduce((sum, e) => sum + e.amount, 0)
   
-  // Calculate unique days to get accurate daily average
   const uniqueDays = new Set(entries.map(e => e.date)).size
   const dailyAverage = uniqueDays > 0 ? totalWater / uniqueDays : 0
   const dailyPercent = (dailyAverage / limits.daily) * 100
@@ -105,7 +101,6 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
           </button>
         </div>
         <div className="flex items-center gap-3">
-          {/* Entity Type Selector */}
           <div className="flex bg-slate-100 rounded-lg p-1">
             {ENTITY_OPTIONS.map((option) => {
               const Icon = option.icon
@@ -136,7 +131,6 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
         </div>
       </header>
       <div className="p-8 space-y-6 max-w-7xl mx-auto">
-        {/* Limits Info Bar */}
         <div className="flex items-center gap-6 px-4 py-3 bg-white rounded-lg border border-slate-200 shadow-sm">
           <span className="text-sm font-medium text-slate-600">
             {ENTITY_LIMITS[entityType].label} Limits:
@@ -145,7 +139,6 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
           <span className="text-sm text-slate-600">Monthly: <strong>{formatAmount(limits.monthly)}</strong></span>
         </div>
 
-        {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard 
             title="Total Entries" 
@@ -171,7 +164,7 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
                 <span className="material-symbols-outlined text-sky-600">calendar_today</span>
               </div>
             </div>
-            {/* Progress bar with tooltip */}
+      
             <div className="mt-4 group relative">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-slate-500">vs {formatAmount(limits.daily)} limit</span>
@@ -186,7 +179,7 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
                   style={{ width: `${Math.min(dailyPercent, 100)}%` }}
                 />
               </div>
-              {/* Tooltip */}
+              
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 {formatAmount(dailyAverage)} / {formatAmount(limits.daily)} daily limit
               </div>
@@ -200,7 +193,7 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
           </div>
         </div>
 
-        {/* Filters */}
+      
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
@@ -243,7 +236,7 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
           </div>
         </div>
 
-        {/* Table */}
+        
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -262,7 +255,7 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
                   const dateObj = new Date(e.created_at)
                   const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                   const percentOfDaily = (e.amount / limits.daily) * 100
-                  const entryAlertLevel = getAlertLevel(percentOfDaily * 5) // Scale for individual entry context
+                  const entryAlertLevel = getAlertLevel(percentOfDaily * 5)
                   
                   return (
                     <tr key={e.id} className="hover:bg-slate-50 transition-colors">
@@ -283,7 +276,7 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
                             />
                           </div>
                           <span className="text-xs text-slate-500">{percentOfDaily.toFixed(1)}%</span>
-                          {/* Tooltip */}
+                          
                           <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                             {formatAmount(e.amount)} of {formatAmount(limits.daily)} daily limit
                           </div>

@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkAuth = async () => {
       try {
         const response = await fetch("/api/auth/me")
@@ -106,7 +105,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      // call backend to clear cookie
       await fetch('/api/auth/logout', { method: 'POST' })
       try {
         localStorage.removeItem("authToken")

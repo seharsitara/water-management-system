@@ -26,13 +26,12 @@ export default function Dashboard() {
   const displayCategories: UsageCategory[] = usageByCategory.length ? usageByCategory : []
   const displayEntries = recentEntries
 
-  const dailyLimitValue = dailyLimit || 500  // Realistic home default: 500L/day
+  const dailyLimitValue = dailyLimit || 500
   const todaysValue = todaysTotal || 0
-  const dailyPercent = dailyLimitValue ? Math.round((todaysValue / dailyLimitValue) * 100) : 0  // Show actual percentage, no cap
+  const dailyPercent = dailyLimitValue ? Math.round((todaysValue / dailyLimitValue) * 100) : 0
   const monthlyValue = monthlyTotal || 0
-  const monthlyTargetValue = monthlyTarget || 15000  // Realistic home default: 15000L/month
+  const monthlyTargetValue = monthlyTarget || 15000
 
-  // Risk levels: 🟢 Normal (<80%), 🟡 Warning (80-100%), 🔴 Critical (>100%)
   const getRiskLevel = (percent: number) => {
     if (percent >= 100) return { label: "Critical", color: "text-red-700 bg-red-100", dotColor: "bg-red-500" }
     if (percent >= 80) return { label: "Warning", color: "text-amber-700 bg-amber-100", dotColor: "bg-amber-500" }
@@ -52,7 +51,6 @@ export default function Dashboard() {
 
   const weekly = weeklyTrends && weeklyTrends.labels?.length === 7 ? weeklyTrends : fallbackWeekly
 
-  // Use backend peak usage data or fallback to calculating from weekly trends
   const peakDayName = peakUsageDay?.dayName || weekly.labels[weekly.thisWeek.indexOf(Math.max(...weekly.thisWeek))] || "N/A"
   const peakDayUsage = peakUsageDay?.usage ?? Math.max(...weekly.thisWeek)
   const avgDayUsage = peakUsageDay?.avgUsage ?? weekly.thisWeek.reduce((a, b) => a + b, 0) / 7
@@ -112,7 +110,6 @@ export default function Dashboard() {
               <p className="text-sm text-slate-500">Live overview of today and this month</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              {/* Entity Type Selector */}
               <div className="flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
                 {ENTITY_OPTIONS.map((option) => {
                   const Icon = option.icon
@@ -152,7 +149,6 @@ export default function Dashboard() {
           )}
           {error && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">{error}</div>}
 
-          {/* Limits Info */}
           <div className="flex items-center gap-4 px-4 py-3 bg-white rounded-lg border border-slate-200 shadow-sm">
             <span className="text-sm font-medium text-slate-600">
               {entityType === 'home' ? '🏠 Home' : entityType === 'society' ? '🏢 Society' : '🏭 Industry'} Limits:
@@ -190,7 +186,7 @@ export default function Dashboard() {
                     dailyPercent >= 100 ? "text-rose-600" : dailyPercent >= 80 ? "text-amber-600" : "text-sky-600"
                   )}>{dailyPercent}% Used</span>
                 </div>
-                {/* Progress bar with tooltip */}
+                
                 <div className="group relative">
                   <div className="h-2 w-full rounded-full bg-slate-100">
                     <div 
@@ -201,7 +197,7 @@ export default function Dashboard() {
                       style={{ width: `${Math.min(dailyPercent, 100)}%` }} 
                     />
                   </div>
-                  {/* Tooltip */}
+                  
                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                     {todaysValue.toFixed(1)} L / {dailyLimitValue.toFixed(0)} L daily limit
                   </div>
@@ -210,7 +206,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Peak Usage Day Card */}
+           
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-start justify-between">
                 <p className="text-sm font-medium text-slate-500">Peak Usage Day</p>
@@ -237,7 +233,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Monthly Summary Card */}
+         
           <div className="rounded-xl border border-sky-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -284,7 +280,7 @@ export default function Dashboard() {
                   monthlyPercent >= 100 ? "text-rose-600" : monthlyPercent >= 80 ? "text-amber-600" : "text-sky-600"
                 )}>{monthlyTargetValue > 0 ? Math.min(Math.round((monthlyValue / monthlyTargetValue) * 100), 100) : 0}%</span>
               </div>
-              {/* Monthly progress bar with tooltip */}
+              
               <div className="group relative">
                 <div className="h-3 w-full rounded-full bg-sky-100">
                   <div
@@ -295,7 +291,7 @@ export default function Dashboard() {
                     style={{ width: `${Math.min((monthlyValue / monthlyTargetValue) * 100, 100)}%` }}
                   />
                 </div>
-                {/* Tooltip */}
+                
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                   {monthlyValue.toFixed(0)} L / {monthlyTargetValue.toFixed(0)} L monthly target
                 </div>
@@ -328,7 +324,7 @@ export default function Dashboard() {
                             {used.toFixed(1)}/{limit.toFixed(1)} L
                           </p>
                         </div>
-                        {/* Progress bar with tooltip */}
+                        
                         <div className="group relative">
                           <div className="mt-1 h-2 w-full rounded-full bg-slate-200">
                             <div
@@ -339,7 +335,7 @@ export default function Dashboard() {
                               style={{ width: `${Math.min(percent, 100)}%` }}
                             />
                           </div>
-                          {/* Tooltip */}
+                          
                           <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                             {used.toFixed(1)} L / {limit.toFixed(1)} L ({percent.toFixed(0)}%)
                           </div>
@@ -382,7 +378,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Weekly Trends - Full Width */}
+          
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div>

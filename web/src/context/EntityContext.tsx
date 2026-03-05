@@ -4,7 +4,6 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 
 export type EntityType = 'home' | 'society' | 'industry'
 
-// Entity-specific limits configuration
 export const ENTITY_LIMITS = {
   home: {
     daily: 500,
@@ -29,21 +28,18 @@ export const ENTITY_LIMITS = {
   },
 } as const
 
-// Alert threshold levels
 export const ALERT_THRESHOLDS = {
   normal: { max: 80, color: 'emerald', label: 'Normal', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700', borderColor: 'border-emerald-200' },
   warning: { min: 80, max: 100, color: 'amber', label: 'Warning', bgColor: 'bg-amber-100', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
   critical: { min: 100, color: 'red', label: 'Critical', bgColor: 'bg-red-100', textColor: 'text-red-700', borderColor: 'border-red-200' },
 } as const
 
-// Helper to get alert level based on percentage
 export function getAlertLevel(percent: number) {
   if (percent >= 100) return ALERT_THRESHOLDS.critical
   if (percent >= 80) return ALERT_THRESHOLDS.warning
   return ALERT_THRESHOLDS.normal
 }
 
-// Helper to format large numbers (for industry)
 export function formatWaterAmount(amount: number, entityType: EntityType = 'home'): string {
   if (entityType === 'industry' && amount >= 1000) {
     return `${(amount / 1000).toFixed(1)}k L`
@@ -51,7 +47,6 @@ export function formatWaterAmount(amount: number, entityType: EntityType = 'home
   return `${amount.toFixed(0)} L`
 }
 
-// Entity type limits type
 type EntityLimits = {
   daily: number
   monthly: number
@@ -60,7 +55,6 @@ type EntityLimits = {
   icon: string
 }
 
-// Context type
 interface EntityContextType {
   entityType: EntityType
   setEntityType: (type: EntityType) => void
@@ -70,7 +64,6 @@ interface EntityContextType {
 
 const EntityContext = createContext<EntityContextType | null>(null)
 
-// Provider component
 export function EntityProvider({ children }: { children: ReactNode }) {
   const [entityType, setEntityType] = useState<EntityType>('home')
   
@@ -87,7 +80,6 @@ export function EntityProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// Hook to use entity context
 export function useEntity() {
   const context = useContext(EntityContext)
   if (!context) {
@@ -96,7 +88,6 @@ export function useEntity() {
   return context
 }
 
-// Hook for standalone use (when context not needed)
 export function useEntityLimits(entityType: EntityType = 'home') {
   return ENTITY_LIMITS[entityType]
 }

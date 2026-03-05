@@ -10,7 +10,6 @@ import { ReportsResponse } from "@/types/dashboard"
 
 type EntityType = 'home' | 'society' | 'industry'
 
-// Entity-specific limits
 const ENTITY_LIMITS = {
   home: { daily: 500, monthly: 15000, label: 'Home' },
   society: { daily: 5000, monthly: 150000, label: 'Society' },
@@ -23,7 +22,6 @@ const ENTITY_OPTIONS = [
   { value: 'industry' as EntityType, label: 'Industry', icon: Factory },
 ]
 
-// Get alert level based on percentage
 const getAlertLevel = (percent: number) => {
   if (percent >= 100) return { type: 'critical', color: 'red', bgColor: 'bg-red-100', textColor: 'text-red-700', barColor: 'bg-red-500' }
   if (percent >= 80) return { type: 'warning', color: 'amber', bgColor: 'bg-amber-100', textColor: 'text-amber-700', barColor: 'bg-amber-500' }
@@ -41,7 +39,6 @@ export function DetailedReports() {
 
   const limits = ENTITY_LIMITS[entityType]
 
-  // Sync entity type with dashboard
   useEffect(() => {
     setDashboardEntityType(entityType)
   }, [entityType, setDashboardEntityType])
@@ -50,7 +47,6 @@ export function DetailedReports() {
     fetchReports().then(setReports).catch(() => setReports(null))
   }, [])
 
-  // Format amount based on entity type
   const formatAmount = (amount: number) => {
     if (entityType === 'industry' && amount >= 1000) {
       return `${(amount / 1000).toFixed(1)}k L`
@@ -58,7 +54,6 @@ export function DetailedReports() {
     return `${amount.toFixed(0)} L`
   }
 
-  // Monthly trend data from backend (30 days)
   const monthlyTrendData = reports?.monthlyTrend ?? []
 
   const categoryChartData = usageByCategory.map((cat) => ({
@@ -71,7 +66,7 @@ export function DetailedReports() {
     label: cat.label,
     monthlyUsed: cat.monthlyUsed ?? 0,
     dailyUsed: cat.dailyUsed ?? 0,
-    dailyLimit: cat.dailyLimit ?? limits.daily / 5,  // Default proportional to entity
+    dailyLimit: cat.dailyLimit ?? limits.daily / 5,
     monthlyLimit: cat.monthlyLimit ?? limits.monthly / 5,
   }))
 
@@ -80,13 +75,11 @@ export function DetailedReports() {
   const mostUsedCategory = categoryBreakdown.reduce((max, cat) => (cat.monthlyUsed > max.monthlyUsed ? cat : max), categoryBreakdown[0] || { label: "N/A", monthlyUsed: 0, dailyUsed: 0, dailyLimit: 100, monthlyLimit: 3000 })
   const mostUsedPercent = totalConsumption > 0 ? ((mostUsedCategory.monthlyUsed / totalConsumption) * 100).toFixed(0) : "0"
 
-  // Calculate percentages against entity limits
   const monthlyPercent = (totalConsumption / limits.monthly) * 100
   const dailyPercent = (avgDailyUsage / limits.daily) * 100
   const monthlyAlertLevel = getAlertLevel(monthlyPercent)
   const dailyAlertLevel = getAlertLevel(dailyPercent)
 
-  // YoY data from backend
   const yoyChange = reports?.yoyChange ?? 0
   const yoyPositive = reports?.yoyPositive ?? false
 
@@ -101,7 +94,6 @@ export function DetailedReports() {
 
   return (
     <div className="flex-1 space-y-8 px-6 py-6 lg:px-10">
-      {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Detailed Reports</h2>
@@ -110,7 +102,6 @@ export function DetailedReports() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Entity Type Selector */}
           <div className="flex bg-slate-100 rounded-lg p-1">
             {ENTITY_OPTIONS.map((option) => {
               const Icon = option.icon
@@ -162,7 +153,6 @@ export function DetailedReports() {
       {loading && <div className="rounded-lg border border-sky-100 bg-sky-50 px-4 py-2 text-sm text-sky-800">Loading reports...</div>}
       {error && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">{error}</div>}
 
-      {/* KPIs with color-coded progress */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <KPICard
           label="Total Consumption"
@@ -202,9 +192,7 @@ export function DetailedReports() {
         />
       </section>
 
-      {/* Charts */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Monthly Trend Chart */}
         <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -252,7 +240,6 @@ export function DetailedReports() {
           </div>
         </div>
 
-        {/* Category Breakdown with progress bars */}
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <h4 className="text-lg font-bold mb-6">Consumption by Category</h4>
           <div className="space-y-5">
@@ -287,7 +274,7 @@ export function DetailedReports() {
         </div>
       </section>
 
-      {/* Detailed Usage Log */}
+      
       <section className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="p-6 border-b border-slate-200 flex justify-between items-center">
           <h4 className="text-lg font-bold">Detailed Usage Log</h4>
@@ -343,7 +330,6 @@ export function DetailedReports() {
                         <span className="text-xs font-medium text-slate-600">
                           {percentOfDaily.toFixed(1)}%
                         </span>
-                        {/* Tooltip */}
                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
                           {entry.volume} of {formatAmount(limits.daily)} daily limit
                         </div>
@@ -429,7 +415,7 @@ function KPICard({
         <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
         <span className="text-xs text-slate-500">{trend}</span>
       </div>
-      {/* Progress bar with tooltip */}
+      
       <div className="mt-4 group relative">
         <div className="flex justify-between text-xs mb-1">
           <span className="text-slate-400">Progress</span>
@@ -441,12 +427,11 @@ function KPICard({
             style={{ width: `${Math.min(progress, 100)}%` }} 
           />
         </div>
-        {/* Tooltip */}
+        
         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
           {tooltip}
         </div>
       </div>
-      {/* Alert Badge - only show when there's an issue */}
       {alertLevel.type === 'critical' && (
         <div className="mt-3 px-2 py-1 rounded-full text-xs font-bold text-center bg-red-100 text-red-700">
           ⚠️ Over Limit

@@ -30,7 +30,6 @@ export function useHistory() {
       const data = await fetchHistory()
       setState({ entries: data, loading: false, error: null })
     } catch (err: any) {
-      // Suppress auth errors (401/Invalid token) - just show empty data for guests
       const isAuthError = err.status === 401 || err.message?.toLowerCase().includes("invalid token") || err.message?.toLowerCase().includes("unauthorized")
       setState((s) => ({ ...s, loading: false, error: isAuthError ? null : (err.message || "Failed to load history") }))
     }
@@ -39,7 +38,6 @@ export function useHistory() {
   useEffect(() => {
     load()
     
-    // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
       load()
     }, 30000)

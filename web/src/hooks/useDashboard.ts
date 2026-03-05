@@ -42,7 +42,6 @@ export function useDashboard(initialEntityType: EntityType = 'home') {
     error: null,
   })
 
-  // Use ref to track current entity type to avoid dependency issues
   const entityTypeRef = React.useRef(state.entityType)
   entityTypeRef.current = state.entityType
 
@@ -60,13 +59,11 @@ export function useDashboard(initialEntityType: EntityType = 'home') {
         error: null 
       })
     } catch (err: any) {
-      // Suppress auth errors (401/Invalid token) - just show empty data for guests
       const isAuthError = err.status === 401 || err.message?.toLowerCase().includes("invalid token") || err.message?.toLowerCase().includes("unauthorized")
       setState((s) => ({ ...s, loading: false, error: isAuthError ? null : (err.message ?? "Failed to load dashboard") }))
     }
-  }, []) // No dependencies - uses ref for entityType
+  }, [])
 
-  // Simple reload function for button clicks (no parameters)
   const reload = useCallback(() => {
     load()
   }, [load])
@@ -82,7 +79,6 @@ export function useDashboard(initialEntityType: EntityType = 'home') {
       const created = await createUsage(payload)
       await load()
 
-      // check for any new alert for this category
       try {
         const alerts = await fetchAlerts()
         const recent = alerts.find((a: any) => a.category_name === payload.usageType)
@@ -103,13 +99,11 @@ export function useDashboard(initialEntityType: EntityType = 'home') {
   useEffect(() => {
     load(initialEntityType)
     
-    // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
       reload()
     }, 30000)
     
     return () => clearInterval(interval)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return { ...state, reload, addEntry, setEntityType }

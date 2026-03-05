@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
     console.log('signup body', body)
     const { email, name, password } = body
 
-    // ensure base URL is configured
     let baseUrl = process.env.NEXT_PUBLIC_API_BASE || process.env.NEXT_PUBLIC_API_URL
     if (!baseUrl) {
       console.warn('API base URL not set, using http://localhost:8000 (backend)')
@@ -15,7 +14,6 @@ export async function POST(request: NextRequest) {
     if (baseUrl.includes('localhost:3000')) {
       console.warn('API base URL points to the frontend; make sure it is your backend URL')
     }
-    // Call your NestJS backend
     const fetchUrl = `${baseUrl}/auth/signup`
     console.log('fetching backend url', fetchUrl)
     const response = await fetch(fetchUrl, {
@@ -36,12 +34,11 @@ export async function POST(request: NextRequest) {
       token: data.access_token,
     })
 
-    // Store token in cookie
     res.cookies.set('authToken', data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 7 * 24 * 60 * 60,
     })
 
     return res

@@ -25,6 +25,14 @@ export interface RecentEntry {
   duration?: string
 }
 
+export interface PeakUsageDay {
+  dayName: string
+  dayIndex: number
+  usage: number
+  avgUsage: number
+  percentVsAvg: number
+}
+
 export interface DashboardResponse {
   summaryCards: SummaryCard[]
   usageByCategory: UsageCategory[]
@@ -35,6 +43,7 @@ export interface DashboardResponse {
   monthlyTarget: number
   weeklyTrends?: WeeklyTrends
   entityType?: EntityType
+  peakUsageDay?: PeakUsageDay
 }
 
 export interface WeeklyTrends {
