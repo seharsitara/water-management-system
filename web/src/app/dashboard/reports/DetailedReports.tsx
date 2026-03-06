@@ -92,6 +92,19 @@ export function DetailedReports() {
 
   const colors = ["#0ea5e9", "#f97316", "#10b981", "#8b5cf6", "#ec4899"]
 
+  const totalEntries = recentEntries.length
+  const remainingDaily = Math.max(0, limits.daily - avgDailyUsage)
+  const remainingMonthly = Math.max(0, limits.monthly - totalConsumption)
+
+  const formatPercentage = (percent: number) => {
+    if (percent === 0) return "0%"
+    if (percent < 0.1) return `${percent.toFixed(2)}%`
+    if (percent < 1) return `${percent.toFixed(1)}%`
+    return `${percent.toFixed(0)}%`
+  }
+
+  const hasYoyData = reports?.thisYearTotal !== undefined && reports?.lastYearTotal !== undefined && reports.lastYearTotal > 0
+
   return (
     <div className="flex-1 space-y-8 px-6 py-6 lg:px-10">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -153,6 +166,22 @@ export function DetailedReports() {
       {loading && <div className="rounded-lg border border-sky-100 bg-sky-50 px-4 py-2 text-sm text-sky-800">Loading reports...</div>}
       {error && <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">{error}</div>}
 
+      {/* Quick Summary Cards */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Entries</p>
+          <p className="text-2xl font-bold text-sky-600 mt-1">{totalEntries}</p>
+        </div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Remaining Daily Limit</p>
+          <p className="text-2xl font-bold text-sky-600 mt-1">{formatAmount(remainingDaily)}</p>
+        </div>
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Remaining Monthly Limit</p>
+          <p className="text-2xl font-bold text-sky-600 mt-1">{formatAmount(remainingMonthly)}</p>
+        </div>
+      </section>
+
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <KPICard
           label="Total Consumption"
@@ -160,6 +189,7 @@ export function DetailedReports() {
           trend="this month"
           trendPositive={monthlyPercent < 80}
           progress={monthlyPercent}
+          formatPercentage={formatPercentage}
           alertLevel={monthlyAlertLevel}
           tooltip={`${formatAmount(totalConsumption)} / ${formatAmount(limits.monthly)} monthly limit`}
         />
@@ -169,26 +199,29 @@ export function DetailedReports() {
           trend="per day" 
           trendPositive={dailyPercent < 80} 
           progress={dailyPercent}
+          formatPercentage={formatPercentage}
           alertLevel={dailyAlertLevel}
           tooltip={`${formatAmount(avgDailyUsage)} / ${formatAmount(limits.daily)} daily limit`}
         />
         <KPICard
           label="Most Used Category"
           value={mostUsedCategory.label}
-          trend={`${mostUsedPercent}% total`}
-          trendPositive={false}
+          trend={`${mostUsedPercent}% of total`}
+          trendPositive={true}
           progress={Number(mostUsedPercent)}
-          alertLevel={getAlertLevel(Number(mostUsedPercent))}
+          formatPercentage={formatPercentage}
+          alertLevel={getAlertLevel(0)}
           tooltip={`${formatAmount(mostUsedCategory.monthlyUsed)} used this month`}
         />
         <KPICard 
           label="YoY Change" 
-          value={`${yoyChange >= 0 ? '+' : ''}${yoyChange}%`} 
-          trend="vs Prev Year" 
-          trendPositive={yoyPositive} 
-          progress={Math.min(Math.abs(yoyChange), 100)}
-          alertLevel={yoyPositive ? getAlertLevel(0) : getAlertLevel(100)}
-          tooltip={yoyPositive ? "Great! You're saving water" : "Usage increased vs last year"}
+          value={hasYoyData ? `${yoyChange >= 0 ? '+' : ''}${yoyChange}%` : 'N/A'} 
+          trend={hasYoyData ? "vs Prev Year" : "No data available"} 
+          trendPositive={hasYoyData ? yoyPositive : true} 
+          progress={hasYoyData ? Math.min(Math.abs(yoyChange), 100) : 0}
+          formatPercentage={formatPercentage}
+          alertLevel={hasYoyData ? (yoyPositive ? getAlertLevel(0) : getAlertLevel(100)) : getAlertLevel(0)}
+          tooltip={hasYoyData ? (yoyPositive ? "Great! You're saving water" : "Usage increased vs last year") : "Start tracking to see year-over-year comparison"}
         />
       </section>
 
@@ -196,8 +229,8 @@ export function DetailedReports() {
         <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h4 className="text-lg font-bold">Monthly Consumption Trend</h4>
-              <p className="text-xs text-slate-500">Last 30 days usage vs {formatAmount(limits.daily)} daily limit</p>
+              <h4 className="text-lg font-bold">Daily Water Consumption vs Limit</h4>
+              <p className="text-xs text-slate-500">Last 30 Days · {formatAmount(limits.daily)} daily limit for {ENTITY_LIMITS[entityType].label}</p>
             </div>
             <div className="flex items-center gap-4 text-xs font-medium text-slate-500">
               <div className="flex items-center gap-1">
@@ -248,24 +281,24 @@ export function DetailedReports() {
               const limitPercent = cat.monthlyLimit > 0 ? (cat.monthlyUsed / cat.monthlyLimit) * 100 : 0
               const alertLevel = getAlertLevel(limitPercent)
               const isAlert = alertLevel.type !== 'normal'
+              const displayLimitPercent = formatPercentage(limitPercent)
               
               return (
                 <div key={cat.label} className="space-y-2 group relative">
                   <div className="flex justify-between text-xs font-semibold">
                     <span className="text-slate-600">{cat.label}</span>
                     <span className={cn("font-bold", isAlert ? alertLevel.textColor : "text-slate-700")}>
-                      {formatAmount(cat.monthlyUsed)} ({limitPercent.toFixed(0)}%)
+                      {formatAmount(cat.monthlyUsed)} ({displayLimitPercent})
                     </span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                     <div
                       className={cn("h-full rounded-full transition-all", isAlert ? alertLevel.barColor : "bg-sky-500")}
-                      style={{ width: `${Math.min(limitPercent, 100)}%` }}
+                      style={{ width: `${Math.min(Math.max(limitPercent, 0.5), 100)}%` }}
                     />
                   </div>
-                  {/* Tooltip */}
                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                    {formatAmount(cat.monthlyUsed)} / {formatAmount(cat.monthlyLimit)} limit
+                    {formatAmount(cat.monthlyUsed)} / {formatAmount(cat.monthlyLimit)} monthly limit ({displayLimitPercent})
                   </div>
                 </div>
               )
@@ -308,6 +341,7 @@ export function DetailedReports() {
               {paginatedEntries.map((entry, idx) => {
                 const volumeNum = parseFloat(entry.volume.replace(/[^\d.]/g, ''))
                 const percentOfDaily = (volumeNum / limits.daily) * 100
+                const displayPercent = formatPercentage(percentOfDaily)
                 
                 return (
                   <tr key={idx} className="hover:bg-slate-50 transition-colors">
@@ -324,14 +358,14 @@ export function DetailedReports() {
                         <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full bg-sky-500"
-                            style={{ width: `${Math.min(percentOfDaily * 5, 100)}%` }}
+                            style={{ width: `${Math.min(Math.max(percentOfDaily * 5, 1), 100)}%` }}
                           />
                         </div>
                         <span className="text-xs font-medium text-slate-600">
-                          {percentOfDaily.toFixed(1)}%
+                          {displayPercent}
                         </span>
                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                          {entry.volume} of {formatAmount(limits.daily)} daily limit
+                          {entry.volume} of {formatAmount(limits.daily)} daily limit ({displayPercent})
                         </div>
                       </div>
                     </td>
@@ -392,6 +426,7 @@ function KPICard({
   progress,
   alertLevel,
   tooltip,
+  formatPercentage,
 }: {
   label: string
   value: string
@@ -400,8 +435,10 @@ function KPICard({
   progress: number
   alertLevel: ReturnType<typeof getAlertLevel>
   tooltip: string
+  formatPercentage?: (percent: number) => string
 }) {
   const isAlert = alertLevel.type !== 'normal'
+  const displayPercent = formatPercentage ? formatPercentage(progress) : `${progress.toFixed(0)}%`
   
   return (
     <div className={cn(
@@ -419,7 +456,7 @@ function KPICard({
       <div className="mt-4 group relative">
         <div className="flex justify-between text-xs mb-1">
           <span className="text-slate-400">Progress</span>
-          <span className={cn("font-semibold", isAlert ? alertLevel.textColor : "text-slate-600")}>{progress.toFixed(0)}%</span>
+          <span className={cn("font-semibold", isAlert ? alertLevel.textColor : "text-slate-600")}>{displayPercent}</span>
         </div>
         <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
           <div 
@@ -439,7 +476,12 @@ function KPICard({
       )}
       {alertLevel.type === 'warning' && (
         <div className="mt-3 px-2 py-1 rounded-full text-xs font-bold text-center bg-amber-100 text-amber-700">
-          Near Limit
+          ⚡ Near Limit
+        </div>
+      )}
+      {alertLevel.type === 'normal' && progress > 0 && (
+        <div className="mt-3 px-2 py-1 rounded-full text-xs font-bold text-center bg-emerald-100 text-emerald-700">
+          ✅ Within Limit
         </div>
       )}
     </div>

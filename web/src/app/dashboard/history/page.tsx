@@ -217,8 +217,8 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">category</span>
-              <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">expand_more</span>
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></span>
+              <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></span>
             </div>
             <div className="relative">
               <input
@@ -227,7 +227,7 @@ function HistoryContent({ entityType, setEntityType }: { entityType: EntityType;
                 onChange={(e) => { setDateFilter(e.target.value); setCurrentPage(1); }}
                 className="pl-10 pr-4 py-2 rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-sky-500 outline-none text-sm font-medium min-w-[160px]"
               />
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">calendar_today</span>
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></span>
             </div>
             <button className="px-4 py-2 bg-sky-50 text-sky-600 font-semibold rounded-lg hover:bg-sky-100 transition-all text-sm flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">filter_list</span>
